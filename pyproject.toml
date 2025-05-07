@@ -1,0 +1,14 @@
+[project]
+name = "persian-subtitle-fixer"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = [
+    "chardet==5.2.0",
+    "customtkinter==5.2.1",
+    "pyqt5==5.15.4",
+    "pyqt5-qt5==5.15.2",
+    "pyqt5-sip==12.8.1",
+    "tkinterdnd2==0.3.0",
+]

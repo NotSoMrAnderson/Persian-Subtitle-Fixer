@@ -4,7 +4,7 @@ from PyQt5.QtCore import Qt, QPoint
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QApplication, QHBoxLayout, QLabel, QPushButton, QVBoxLayout, QWidget
 
-from Ne0_SubFixer import main
+from subtitle_processor import main
 
 
 class MainWindow(QWidget):

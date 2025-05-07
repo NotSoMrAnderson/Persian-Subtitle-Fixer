@@ -1,0 +1,104 @@
+version = 1
+revision = 2
+requires-python = ">=3.9"
+
+[[package]]
+name = "chardet"
+version = "5.2.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/f3/0d/f7b6ab21ec75897ed80c17d79b15951a719226b9fababf1e40ea74d69079/chardet-5.2.0.tar.gz", hash = "sha256:1b3b6ff479a8c414bc3fa2c0852995695c4a026dcd6d0633b2dd092ca39c1cf7", size = 2069618, upload-time = "2023-08-01T19:23:02.662Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/38/6f/f5fbc992a329ee4e0f288c1fe0e2ad9485ed064cac731ed2fe47dcc38cbf/chardet-5.2.0-py3-none-any.whl", hash = "sha256:e1cf59446890a00105fe7b7912492ea04b6e6f06d4b742b2c788469e34c82970", size = 199385, upload-time = "2023-08-01T19:23:00.661Z" },
+]
+
+[[package]]
+name = "customtkinter"
+version = "5.2.1"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "darkdetect" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/32/70/a2610f2ef9ff91b8fa94281293e653f0a4609a9fce3337d8efb841131b1c/customtkinter-5.2.1.tar.gz", hash = "sha256:eddc1c416063e1ce1aa2793959b0814e95e22d3de3f2a940bd84828f7301f555", size = 262077, upload-time = "2023-10-17T08:53:40.366Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/d9/22/9015be3112284c6bc5ed2ad2122d273a3c2242d5e6cbb121e027d1c77004/customtkinter-5.2.1-py3-none-any.whl", hash = "sha256:8a284d035ccd5537730bc83816bf6c456538ae81594749a946c86470cab6e87b", size = 295978, upload-time = "2023-10-17T08:53:38.153Z" },
+]
+
+[[package]]
+name = "darkdetect"
+version = "0.8.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/45/77/7575be73bf12dee231d0c6e60ce7fb7a7be4fcd58823374fc59a6e48262e/darkdetect-0.8.0.tar.gz", hash = "sha256:b5428e1170263eb5dea44c25dc3895edd75e6f52300986353cd63533fe7df8b1", size = 7681, upload-time = "2022-12-16T14:14:42.113Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/f2/f2/728f041460f1b9739b85ee23b45fa5a505962ea11fd85bdbe2a02b021373/darkdetect-0.8.0-py3-none-any.whl", hash = "sha256:a7509ccf517eaad92b31c214f593dbcf138ea8a43b2935406bbd565e15527a85", size = 8955, upload-time = "2022-12-16T14:14:40.92Z" },
+]
+
+[[package]]
+name = "persian-subtitle-fixer"
+version = "0.1.0"
+source = { virtual = "." }
+dependencies = [
+    { name = "chardet" },
+    { name = "customtkinter" },
+    { name = "pyqt5" },
+    { name = "pyqt5-qt5" },
+    { name = "pyqt5-sip" },
+    { name = "tkinterdnd2" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "chardet", specifier = "==5.2.0" },
+    { name = "customtkinter", specifier = "==5.2.1" },
+    { name = "pyqt5", specifier = "==5.15.4" },
+    { name = "pyqt5-qt5", specifier = "==5.15.2" },
+    { name = "pyqt5-sip", specifier = "==12.8.1" },
+    { name = "tkinterdnd2", specifier = "==0.3.0" },
+]
+
+[[package]]
+name = "pyqt5"
+version = "5.15.4"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "pyqt5-qt5" },
+    { name = "pyqt5-sip" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/8e/a4/d5e4bf99dd50134c88b95e926d7b81aad2473b47fde5e3e4eac2c69a8942/PyQt5-5.15.4.tar.gz", hash = "sha256:2a69597e0dd11caabe75fae133feca66387819fc9bc050f547e5551bce97e5be", size = 3258085, upload-time = "2021-03-10T14:53:17.841Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/0d/6b/7bf2bcbadcbf3157e89353711dd0af606af6ac3df6d93eaeb3fa80ba2cef/PyQt5-5.15.4-cp36.cp37.cp38.cp39-abi3-macosx_10_13_intel.whl", hash = "sha256:8c0848ba790a895801d5bfd171da31cad3e551dbcc4e59677a3b622de2ceca98", size = 6996574, upload-time = "2021-03-10T14:51:18.05Z" },
+    { url = "https://files.pythonhosted.org/packages/ed/62/cd9f10702c75b242f82da858668fba0cda04cda92133244d3d1555e530b4/PyQt5-5.15.4-cp36.cp37.cp38.cp39-abi3-manylinux2014_x86_64.whl", hash = "sha256:883a549382fc22d29a0568f3ef20b38c8e7ab633a59498ac4eb63a3bf36d3fd3", size = 8319367, upload-time = "2021-03-10T14:51:59.09Z" },
+    { url = "https://files.pythonhosted.org/packages/25/e2/0b6d906d5716c7564c8d93eed89d0d51a4fb040d061701e39d74fbe74653/PyQt5-5.15.4-cp36.cp37.cp38.cp39-none-win32.whl", hash = "sha256:a88526a271e846e44779bb9ad7a738c6d3c4a9d01e15a128ecfc6dd4696393b7", size = 5380252, upload-time = "2021-03-10T14:52:26.669Z" },
+    { url = "https://files.pythonhosted.org/packages/9e/53/9476464c2a8db5252de96fd8ff39ec5db6ef09b8a08a7152546b7f142d90/PyQt5-5.15.4-cp36.cp37.cp38.cp39-none-win_amd64.whl", hash = "sha256:213bebd51821ed89b4d5b35bb10dbe67564228b3568f463a351a08e8b1677025", size = 6786727, upload-time = "2021-03-10T14:53:01.145Z" },
+]
+
+[[package]]
+name = "pyqt5-qt5"
+version = "5.15.2"
+source = { registry = "https://pypi.org/simple" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/62/09/99a222b0360616250fb2e6003a54e43a2a06b0774f0f8d5daafb86a2c375/PyQt5_Qt5-5.15.2-py3-none-macosx_10_13_intel.whl", hash = "sha256:76980cd3d7ae87e3c7a33bfebfaee84448fd650bad6840471d6cae199b56e154", size = 40546019, upload-time = "2021-03-10T13:52:47.763Z" },
+    { url = "https://files.pythonhosted.org/packages/83/d4/241a6a518d0bcf0a9fcdcbad5edfed18d43e884317eab8d5230a2b27e206/PyQt5_Qt5-5.15.2-py3-none-manylinux2014_x86_64.whl", hash = "sha256:1988f364ec8caf87a6ee5d5a3a5210d57539988bf8e84714c7d60972692e2f4a", size = 59921716, upload-time = "2021-03-10T13:57:39.485Z" },
+    { url = "https://files.pythonhosted.org/packages/1c/7e/ce7c66a541a105fa98b41d6405fe84940564695e29fc7dccf6d9e8c5f898/PyQt5_Qt5-5.15.2-py3-none-win32.whl", hash = "sha256:9cc7a768b1921f4b982ebc00a318ccb38578e44e45316c7a4a850e953e1dd327", size = 43447358, upload-time = "2021-03-10T14:01:17.827Z" },
+    { url = "https://files.pythonhosted.org/packages/37/97/5d3b222b924fa2ed4c2488925155cd0b03fd5d09ee1cfcf7c553c11c9f66/PyQt5_Qt5-5.15.2-py3-none-win_amd64.whl", hash = "sha256:750b78e4dba6bdf1607febedc08738e318ea09e9b10aea9ff0d73073f11f6962", size = 50075158, upload-time = "2021-03-10T14:05:20.868Z" },
+]
+
+[[package]]
+name = "pyqt5-sip"
+version = "12.8.1"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/73/8c/c662b7ebc4b2407d8679da68e11c2a2eb275f5f2242a92610f6e5024c1f2/PyQt5_sip-12.8.1.tar.gz", hash = "sha256:30e944db9abee9cc757aea16906d4198129558533eb7fadbe48c5da2bd18e0bd", size = 102324, upload-time = "2020-08-29T11:17:35.059Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/54/e8/5a5ffe5eb76e6b312b68dd5f6e83f6b8ef595242f3f13c6ab2ca7366c166/PyQt5_sip-12.8.1-cp39-cp39-macosx_10_9_x86_64.whl", hash = "sha256:c317ab1263e6417c498b81f5c970a9b1af7acefab1f80b4cc0f2f8e661f29fc5", size = 63553, upload-time = "2020-08-29T11:17:27.769Z" },
+    { url = "https://files.pythonhosted.org/packages/e5/dd/7b2d5fbad55405d589745f7302afc6687dfdf33afc9992572134451b1edf/PyQt5_sip-12.8.1-cp39-cp39-manylinux1_x86_64.whl", hash = "sha256:c9d6d448c29dc6606bb7974696608f81f4316c8234f7c7216396ed110075e777", size = 286854, upload-time = "2020-08-29T11:17:30.595Z" },
+    { url = "https://files.pythonhosted.org/packages/68/54/258ddb4fa9cfc3253c67730e2ec65b11c3b5a0a0c4508123152dc794f0b0/PyQt5_sip-12.8.1-cp39-cp39-win32.whl", hash = "sha256:5a011aeff89660622a6d5c3388d55a9d76932f3b82c95e82fc31abd8b1d2990d", size = 51438, upload-time = "2020-08-29T11:17:31.932Z" },
+    { url = "https://files.pythonhosted.org/packages/e4/91/5ef468d1938e8b4044bb5285edee15823fbc9d4407be52515bdd9ad8e534/PyQt5_sip-12.8.1-cp39-cp39-win_amd64.whl", hash = "sha256:f168f0a7f32b81bfeffdf003c36f25d81c97dee5eb67072a5183e761fe250f13", size = 63541, upload-time = "2020-08-29T11:17:33.405Z" },
+]
+
+[[package]]
+name = "tkinterdnd2"
+version = "0.3.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/5c/c0/7ccd8b2723512064e90bdf13d53ca83427ba507e26a7f4b81a18d562d221/tkinterdnd2-0.3.0.tar.gz", hash = "sha256:cb9d72634c42ff2e5a6e34823ef02f7722a5b6ad5cec5e1de82ec8f0c371a614", size = 6788, upload-time = "2021-06-05T16:55:02.194Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/e0/4b/7830aca780e65a3ff543f3e6216f2adce18ee3df8e3baf79907fb5f51ffc/tkinterdnd2-0.3.0-py3-none-any.whl", hash = "sha256:ef3ff4894c75e21ddc3252eb6d1292670824bf20240b9e82da9240631bbe63fe", size = 386660, upload-time = "2021-06-05T16:55:00.725Z" },
+]
