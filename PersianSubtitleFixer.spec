@@ -21,17 +21,16 @@ a = Analysis(
 pyz = PYZ(a.pure, a.zipped_data, cipher=block_cipher)
 
 exe = EXE(
-    pyz,
-    a.scripts,
-    [],
-    exclude_binaries=True,
-    name='PersianSubtitleFixer',
+    path=os.path.join("dist", "PersianSubtitleFixer"),
+    name="PersianSubtitleFixer",
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
     upx=True,
-    console=False,
+    console=True,
+    disable_windowed_traceback=False,
     icon='assets/comics-mask_97446.ico',
+    binaries=[("python311.dll", r"C:\hostedtoolcache\windows\Python\3.11.9\x64\python311.dll", "BINARY")]
 )
 
 coll = COLLECT(

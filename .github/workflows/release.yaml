@@ -32,7 +32,7 @@ jobs:
 
       - name: Build with PyInstaller
         run: |
-          pyinstaller PersianSubtitleFixer.spec
+          pyinstaller --noconfirm --onefile PersianSubtitleFixer.spec
 
       - name: Rename output with version
         if: success()
@@ -66,22 +66,21 @@ jobs:
       - name: Zip Windows build
         if: startsWith(matrix.os, 'Windows')
         run: |
-          $dest = "dist/PersianSubtitleFixer-Windows-${{ env.APP_VERSION }}.zip"
-          Compress-Archive -Path dist/PersianSubtitleFixer-* -DestinationPath $dest
+          Compress-Archive -Path dist\PersianSubtitleFixer\* -DestinationPath dist\PersianSubtitleFixer-Windows-${{ env.APP_VERSION }}.zip
         shell: pwsh
-      
+
       - name: Zip macOS build
         if: startsWith(matrix.os, 'macos')
         run: |
-          cd dist
-          zip -r PersianSubtitleFixer-macOS-${{ env.APP_VERSION }}.zip PersianSubtitleFixer-*
+          cd dist/PersianSubtitleFixer
+          zip -r ../PersianSubtitleFixer-macOS-${{ env.APP_VERSION }}.zip *
         shell: bash
       
       - name: Zip Linux build
         if: startsWith(matrix.os, 'ubuntu')
         run: |
-          cd dist
-          zip -r PersianSubtitleFixer-Linux-${{ env.APP_VERSION }}.zip PersianSubtitleFixer-*
+          cd dist/PersianSubtitleFixer
+          zip -r ../PersianSubtitleFixer-Linux-${{ env.APP_VERSION }}.zip *
         shell: bash
 
       - name: Upload Zipped Output
