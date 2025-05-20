@@ -1,5 +1,3 @@
-# PersianSubtitleFixer.spec
-
 # -*- mode: python ; coding: utf-8 -*-
 
 block_cipher = None
@@ -9,13 +7,15 @@ a = Analysis(
     pathex=[],
     binaries=[],
     datas=[('assets/comics-mask_97446.ico', 'assets')],
-    hiddenimports=['PyQt5.sip'],
+    hiddenimports=['PyQt5.sip', 'PyQt5.QtCore', 'PyQt5.QtGui', 'PyQt5.QtWidgets'],
     hookspath=[],
+    hooksconfig={},
     runtime_hooks=[],
     excludes=[],
     win_no_prefer_redirects=False,
     win_private_assemblies=False,
     cipher=block_cipher,
+    noarchive=False,
 )
 
 pyz = PYZ(a.pure, a.zipped_data, cipher=block_cipher)
@@ -31,6 +31,11 @@ exe = EXE(
     strip=False,
     upx=True,
     console=True,
+    disable_windowed_traceback=False,
+    argv_emulation=False,
+    target_arch=None,
+    codesign_identity=None,
+    entitlements_file=None,
     icon='assets/comics-mask_97446.ico'
 )
 

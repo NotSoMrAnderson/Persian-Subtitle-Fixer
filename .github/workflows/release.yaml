@@ -42,7 +42,9 @@ jobs:
 
       - name: Build with PyInstaller
         run: |
-          pyinstaller PersianSubtitleFixer.spec
+          # Use the --clean flag to ensure a fresh build
+          # Additionally, we're keeping the existing .spec file which already has the proper settings
+          pyinstaller --clean PersianSubtitleFixer.spec
 
       - name: Prepare release package - Windows
         if: matrix.os == 'windows-latest'
@@ -50,15 +52,10 @@ jobs:
           # Create a clean directory for release files
           mkdir -p release
           # Copy the executable and necessary files to release directory
-          cp dist/PersianSubtitleFixer/PersianSubtitleFixer.exe release/PersianSubtitleFixer-${{ env.APP_VERSION }}${{ matrix.executable_ext }}
-          # Copy any other necessary files
-          if (Test-Path "dist/PersianSubtitleFixer/assets") {
-            cp -r dist/PersianSubtitleFixer/assets release/
-          }
-          # Copy any readme or documentation
-          if (Test-Path "README.md") {
-            cp README.md release/
-          }
+          cp -r dist/PersianSubtitleFixer/* release/
+          # Rename the main executable
+          mv release/PersianSubtitleFixer.exe release/PersianSubtitleFixer-${{ env.APP_VERSION }}.exe
+          # Don't copy README to release package
         shell: pwsh
 
       - name: Prepare release package - Unix
@@ -66,18 +63,13 @@ jobs:
         run: |
           # Create a clean directory for release files
           mkdir -p release
-          # Copy the executable and necessary files to release directory
-          cp dist/PersianSubtitleFixer/PersianSubtitleFixer release/PersianSubtitleFixer-${{ env.APP_VERSION }}
+          # Copy all necessary files to maintain proper directory structure
+          cp -r dist/PersianSubtitleFixer/* release/
+          # Rename the main executable
+          mv release/PersianSubtitleFixer release/PersianSubtitleFixer-${{ env.APP_VERSION }}
           # Make executable
           chmod +x release/PersianSubtitleFixer-${{ env.APP_VERSION }}
-          # Copy any other necessary files
-          if [ -d "dist/PersianSubtitleFixer/assets" ]; then
-            cp -r dist/PersianSubtitleFixer/assets release/
-          fi
-          # Copy any readme or documentation
-          if [ -f "README.md" ]; then
-            cp README.md release/
-          fi
+          # Don't copy README to release package
         shell: bash
 
       - name: Windows Code Signing (optional)
@@ -95,7 +87,7 @@ jobs:
               /tr http://timestamp.digicert.com \
               /td sha256 \
               /fd sha256 \
-              release/PersianSubtitleFixer-${{ env.APP_VERSION }}${{ matrix.executable_ext }}
+              release/PersianSubtitleFixer-${{ env.APP_VERSION }}.exe
           else
             echo "Skipping code signing - certificate information not provided or empty"
           fi
