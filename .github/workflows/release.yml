@@ -65,7 +65,7 @@ jobs:
             pyinstaller --onefile --icon "$ICON_ICO" main.py
           fi
         env:
-          APP_VERSION: ${{ env.APP_VERSION }}
+          APP_VERSION: ${{ github.ref_type == 'tag' && github.ref_name || 'dev' }}
 
       - name: Windows Code Signing (optional)
         if: runner.os == 'Windows'
