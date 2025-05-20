@@ -50,7 +50,7 @@ jobs:
           # Create a clean directory for release files
           mkdir -p release
           # Copy the executable and necessary files to release directory
-          cp dist/PersianSubtitleFixer/PersianSubtitleFixer.exe release/PersianSubtitleFixer${{ env.APP_VERSION }}${{ matrix.executable_ext }}
+          cp dist/PersianSubtitleFixer/PersianSubtitleFixer.exe release/PersianSubtitleFixer-${{ env.APP_VERSION }}${{ matrix.executable_ext }}
           # Copy any other necessary files
           if (Test-Path "dist/PersianSubtitleFixer/assets") {
             cp -r dist/PersianSubtitleFixer/assets release/
@@ -67,9 +67,9 @@ jobs:
           # Create a clean directory for release files
           mkdir -p release
           # Copy the executable and necessary files to release directory
-          cp dist/PersianSubtitleFixer/PersianSubtitleFixer release/PersianSubtitleFixer${{ env.APP_VERSION }}
+          cp dist/PersianSubtitleFixer/PersianSubtitleFixer release/PersianSubtitleFixer-${{ env.APP_VERSION }}
           # Make executable
-          chmod +x release/PersianSubtitleFixer${{ env.APP_VERSION }}
+          chmod +x release/PersianSubtitleFixer-${{ env.APP_VERSION }}
           # Copy any other necessary files
           if [ -d "dist/PersianSubtitleFixer/assets" ]; then
             cp -r dist/PersianSubtitleFixer/assets release/
@@ -81,19 +81,24 @@ jobs:
         shell: bash
 
       - name: Windows Code Signing (optional)
-        if: matrix.os == 'windows-latest' && env.WINDOWS_CERT_BASE64 != '' && env.WINDOWS_CERT_PASSWORD != ''
+        if: matrix.os == 'windows-latest'
         shell: bash
         run: |
-          echo "Signing executable..."
-          certPath="$RUNNER_TEMP/cert.pfx"
-          echo "$WINDOWS_CERT_BASE64" | base64 -d > "$certPath"
-          "/c/Program Files (x86)/Windows Kits/10/bin/x64/signtool.exe" sign \
-            /f "$certPath" \
-            /p "$WINDOWS_CERT_PASSWORD" \
-            /tr http://timestamp.digicert.com \
-            /td sha256 \
-            /fd sha256 \
-            release/PersianSubtitleFixer${{ env.APP_VERSION }}${{ matrix.executable_ext }}
+          # Check if we have valid certificate data
+          if [[ -n "$WINDOWS_CERT_BASE64" && "$WINDOWS_CERT_BASE64" != " " && -n "$WINDOWS_CERT_PASSWORD" && "$WINDOWS_CERT_PASSWORD" != " " ]]; then
+            echo "Signing executable..."
+            certPath="$RUNNER_TEMP/cert.pfx"
+            echo "$WINDOWS_CERT_BASE64" | base64 -d > "$certPath"
+            "/c/Program Files (x86)/Windows Kits/10/bin/x64/signtool.exe" sign \
+              /f "$certPath" \
+              /p "$WINDOWS_CERT_PASSWORD" \
+              /tr http://timestamp.digicert.com \
+              /td sha256 \
+              /fd sha256 \
+              release/PersianSubtitleFixer-${{ env.APP_VERSION }}${{ matrix.executable_ext }}
+          else
+            echo "Skipping code signing - certificate information not provided or empty"
+          fi
         env:
           WINDOWS_CERT_BASE64: ${{ secrets.WINDOWS_CERT_BASE64 }}
           WINDOWS_CERT_PASSWORD: ${{ secrets.WINDOWS_CERT_PASSWORD }}
