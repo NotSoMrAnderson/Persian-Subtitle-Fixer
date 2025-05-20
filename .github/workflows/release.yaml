@@ -69,7 +69,7 @@ jobs:
           APP_VERSION: ${{ github.ref_type == 'tag' && github.ref_name || 'dev' }}
 
       - name: Windows Code Signing (optional)
-        if: runner.os == 'Windows'
+        if: runner.os == 'Windows' && github.event_name == 'release' && ${{ secrets.WINDOWS_CERT_BASE64 }} != '' && ${{ secrets.WINDOWS_CERT_PASSWORD }} != ''
         shell: bash
         env:
           WINDOWS_CERT_BASE64: ${{ secrets.WINDOWS_CERT_BASE64 }}
