@@ -34,11 +34,12 @@ jobs:
         run: |
           pyinstaller PersianSubtitleFixer.spec
 
-      - name: Rename output
+      - name: Rename output with version
+        if: success()
         run: |
           ext=""
           if [[ "${{ runner.os }}" == "Windows" ]]; then ext=".exe"; fi
-          mv dist/PersianSubtitleFixer$ext dist/PersianSubtitleFixer-${{ runner.os }}-${{ env.APP_VERSION }}$ext
+          mv dist/PersianSubtitleFixer/PersianSubtitleFixer$ext dist/PersianSubtitleFixer-${{ runner.os }}-${{ env.APP_VERSION }}$ext
         shell: bash
 
       - name: Archive
