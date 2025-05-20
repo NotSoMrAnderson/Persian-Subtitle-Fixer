@@ -47,8 +47,9 @@ jobs:
         if: runner.os == 'macOS'
         run: |
           pyi-makespec --onefile --windowed --icon "$ICON_ICNS" main.py
-          sed -i '' "s/'main.py'/main.py/" main.spec
-          echo -e "\napp = BUNDLE(exe, name='MyApp.app', icon='$ICON_ICNS')" >> main.spec
+          sed -i '' "s/\[main.py\]/\['main.py'\]/" main.spec
+        env:
+          ICON_ICNS: ${{ env.ICON_ICNS }}
 
       - name: Build executable
         run: |
