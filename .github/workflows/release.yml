@@ -57,6 +57,7 @@ jobs:
           ICON_ICNS: ${{ env.ICON_ICNS }}
 
       - name: Build executable
+        shell: bash
         run: |
           echo "Building app version: $APP_VERSION"
           if [ "${{ runner.os }}" = "macOS" ]; then
