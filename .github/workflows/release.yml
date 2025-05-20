@@ -15,8 +15,8 @@ jobs:
         os: [ubuntu-latest, windows-latest, macos-latest]
 
     env:
-      ICON_ICO: assets/icon.ico
-      ICON_ICNS: assets/icon.icns
+      ICON_ICO: assets/comics-mask_97446.ico
+      ICON_ICNS: assets/comics-mask_97446.icns
 
     steps:
       - name: Checkout code
@@ -46,9 +46,9 @@ jobs:
       - name: Generate spec file (macOS only)
         if: runner.os == 'macOS'
         run: |
-          pyi-makespec --onefile --windowed --icon "assets\comics-mask_97446.icns" main.py
+          pyi-makespec --onefile --windowed --icon "$ICON_ICNS" main.py
           sed -i '' "s/'main.py'/main.py/" main.spec
-          echo -e "\napp = BUNDLE(exe, name='MyApp.app', icon='assets\comics-mask_97446.icns')" >> main.spec
+          echo -e "\napp = BUNDLE(exe, name='MyApp.app', icon='$ICON_ICNS')" >> main.spec
 
       - name: Build executable
         run: |
@@ -56,7 +56,7 @@ jobs:
           if [ "${{ runner.os }}" = "macOS" ]; then
             pyinstaller main.spec
           else
-            pyinstaller --onefile --icon "assets\comics-mask_97446.ico" main.py
+            pyinstaller --onefile --icon "$ICON_ICO" main.py
         env:
           APP_VERSION: ${{ env.APP_VERSION }}
 
