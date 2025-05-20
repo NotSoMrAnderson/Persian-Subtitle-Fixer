@@ -38,13 +38,103 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install pyinstaller chardet PyQt5
+          # Install only the minimal dependencies needed
+          pip install pyinstaller==5.13.2 chardet PyQt5
+
+      - name: Install UPX (Windows)
+        if: matrix.os == 'windows-latest'
+        run: |
+          $upxVersion = "4.2.1"
+          $upxZip = "upx-$upxVersion-win64.zip"
+          $upxUrl = "https://github.com/upx/upx/releases/download/v$upxVersion/$upxZip"
+          Invoke-WebRequest -Uri $upxUrl -OutFile $upxZip
+          Expand-Archive -Path $upxZip -DestinationPath .
+          echo "$pwd\upx-$upxVersion-win64" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+        shell: pwsh
+
+      - name: Install UPX (Linux)
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y upx-ucl
+        shell: bash
+
+      - name: Install UPX (macOS)
+        if: matrix.os == 'macos-latest'
+        run: |
+          brew install upx
+        shell: bash
 
       - name: Build with PyInstaller
         run: |
           # Use the --clean flag to ensure a fresh build
-          # Additionally, we're keeping the existing .spec file which already has the proper settings
           pyinstaller --clean PersianSubtitleFixer.spec
+
+      - name: Clean unnecessary files (All platforms)
+        run: |
+          # List of directories and file patterns to remove
+          if [ "$RUNNER_OS" = "Windows" ]; then
+            # Remove unnecessary Qt modules and libraries
+            rm -rf dist/PersianSubtitleFixer/PyQt5/Qt5/qml
+            rm -rf dist/PersianSubtitleFixer/PyQt5/Qt5/plugins/bearer
+            rm -rf dist/PersianSubtitleFixer/PyQt5/Qt5/plugins/generic
+            rm -rf dist/PersianSubtitleFixer/PyQt5/Qt5/plugins/geometryloaders
+            rm -rf dist/PersianSubtitleFixer/PyQt5/Qt5/plugins/imageformats/q{gif,icns,tga,wbmp,webp,pdf,svg,tiff,jp2,mng}.dll
+            rm -rf dist/PersianSubtitleFixer/PyQt5/Qt5/plugins/mediaservice
+            rm -rf dist/PersianSubtitleFixer/PyQt5/Qt5/plugins/platforms/q{minimal,offscreen,webgl}.dll
+            rm -rf dist/PersianSubtitleFixer/PyQt5/Qt5/plugins/playlistformats
+            rm -rf dist/PersianSubtitleFixer/PyQt5/Qt5/plugins/position
+            rm -rf dist/PersianSubtitleFixer/PyQt5/Qt5/plugins/printsupport
+            rm -rf dist/PersianSubtitleFixer/PyQt5/Qt5/plugins/renderplugins
+            rm -rf dist/PersianSubtitleFixer/PyQt5/Qt5/plugins/sceneparsers
+            rm -rf dist/PersianSubtitleFixer/PyQt5/Qt5/plugins/sensorgestures
+            rm -rf dist/PersianSubtitleFixer/PyQt5/Qt5/plugins/sensors
+            rm -rf dist/PersianSubtitleFixer/PyQt5/Qt5/plugins/sqldrivers
+            rm -rf dist/PersianSubtitleFixer/PyQt5/Qt5/plugins/texttospeech
+            rm -rf dist/PersianSubtitleFixer/PyQt5/Qt5/plugins/webview
+            rm -rf dist/PersianSubtitleFixer/PyQt5/Qt5/translations
+          elif [ "$RUNNER_OS" = "Linux" ]; then
+            # Remove unnecessary Qt modules and libraries
+            rm -rf dist/PersianSubtitleFixer/PyQt5/Qt5/qml
+            rm -rf dist/PersianSubtitleFixer/PyQt5/Qt5/plugins/bearer
+            rm -rf dist/PersianSubtitleFixer/PyQt5/Qt5/plugins/generic
+            rm -rf dist/PersianSubtitleFixer/PyQt5/Qt5/plugins/geometryloaders
+            rm -rf dist/PersianSubtitleFixer/PyQt5/Qt5/plugins/imageformats/libq{gif,icns,tga,wbmp,webp,pdf,svg,tiff,jp2,mng}.so
+            rm -rf dist/PersianSubtitleFixer/PyQt5/Qt5/plugins/mediaservice
+            rm -rf dist/PersianSubtitleFixer/PyQt5/Qt5/plugins/platforms/libq{minimal,offscreen,webgl}.so
+            rm -rf dist/PersianSubtitleFixer/PyQt5/Qt5/plugins/playlistformats
+            rm -rf dist/PersianSubtitleFixer/PyQt5/Qt5/plugins/position
+            rm -rf dist/PersianSubtitleFixer/PyQt5/Qt5/plugins/printsupport
+            rm -rf dist/PersianSubtitleFixer/PyQt5/Qt5/plugins/renderplugins
+            rm -rf dist/PersianSubtitleFixer/PyQt5/Qt5/plugins/sceneparsers
+            rm -rf dist/PersianSubtitleFixer/PyQt5/Qt5/plugins/sensorgestures
+            rm -rf dist/PersianSubtitleFixer/PyQt5/Qt5/plugins/sensors
+            rm -rf dist/PersianSubtitleFixer/PyQt5/Qt5/plugins/sqldrivers
+            rm -rf dist/PersianSubtitleFixer/PyQt5/Qt5/plugins/texttospeech
+            rm -rf dist/PersianSubtitleFixer/PyQt5/Qt5/plugins/webview
+            rm -rf dist/PersianSubtitleFixer/PyQt5/Qt5/translations
+          elif [ "$RUNNER_OS" = "macOS" ]; then
+            # Remove unnecessary Qt modules and libraries
+            rm -rf dist/PersianSubtitleFixer/PyQt5/Qt5/qml
+            rm -rf dist/PersianSubtitleFixer/PyQt5/Qt5/plugins/bearer
+            rm -rf dist/PersianSubtitleFixer/PyQt5/Qt5/plugins/generic
+            rm -rf dist/PersianSubtitleFixer/PyQt5/Qt5/plugins/geometryloaders
+            rm -rf dist/PersianSubtitleFixer/PyQt5/Qt5/plugins/imageformats/libq{gif,icns,tga,wbmp,webp,pdf,svg,tiff,jp2,mng}.dylib
+            rm -rf dist/PersianSubtitleFixer/PyQt5/Qt5/plugins/mediaservice
+            rm -rf dist/PersianSubtitleFixer/PyQt5/Qt5/plugins/platforms/libq{minimal,offscreen,webgl}.dylib
+            rm -rf dist/PersianSubtitleFixer/PyQt5/Qt5/plugins/playlistformats
+            rm -rf dist/PersianSubtitleFixer/PyQt5/Qt5/plugins/position
+            rm -rf dist/PersianSubtitleFixer/PyQt5/Qt5/plugins/printsupport
+            rm -rf dist/PersianSubtitleFixer/PyQt5/Qt5/plugins/renderplugins
+            rm -rf dist/PersianSubtitleFixer/PyQt5/Qt5/plugins/sceneparsers
+            rm -rf dist/PersianSubtitleFixer/PyQt5/Qt5/plugins/sensorgestures
+            rm -rf dist/PersianSubtitleFixer/PyQt5/Qt5/plugins/sensors
+            rm -rf dist/PersianSubtitleFixer/PyQt5/Qt5/plugins/sqldrivers
+            rm -rf dist/PersianSubtitleFixer/PyQt5/Qt5/plugins/texttospeech
+            rm -rf dist/PersianSubtitleFixer/PyQt5/Qt5/plugins/webview
+            rm -rf dist/PersianSubtitleFixer/PyQt5/Qt5/translations
+          fi
+        shell: bash
 
       - name: Prepare release package - Windows
         if: matrix.os == 'windows-latest'
@@ -55,7 +145,6 @@ jobs:
           cp -r dist/PersianSubtitleFixer/* release/
           # Rename the main executable
           mv release/PersianSubtitleFixer.exe release/PersianSubtitleFixer-${{ env.APP_VERSION }}.exe
-          # Don't copy README to release package
         shell: pwsh
 
       - name: Prepare release package - Unix
@@ -69,7 +158,6 @@ jobs:
           mv release/PersianSubtitleFixer release/PersianSubtitleFixer-${{ env.APP_VERSION }}
           # Make executable
           chmod +x release/PersianSubtitleFixer-${{ env.APP_VERSION }}
-          # Don't copy README to release package
         shell: bash
 
       - name: Windows Code Signing (optional)

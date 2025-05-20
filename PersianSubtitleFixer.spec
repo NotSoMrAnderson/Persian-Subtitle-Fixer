@@ -7,11 +7,11 @@ a = Analysis(
     pathex=[],
     binaries=[],
     datas=[('assets/comics-mask_97446.ico', 'assets')],
-    hiddenimports=['PyQt5.sip', 'PyQt5.QtCore', 'PyQt5.QtGui', 'PyQt5.QtWidgets'],
+    hiddenimports=['PyQt5.sip'],  # Reduced hiddenimports to only what's essential
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],
-    excludes=[],
+    excludes=['_gtkagg', '_tkagg', 'blib2to3', 'distutils', 'email', 'ftplib', 'html', 'http', 'lib2to3', 'logging', 'numpy', 'pandas', 'pydoc_data', 'pytz', 'test', 'unittest', 'xml'],  # Exclude unnecessary modules
     win_no_prefer_redirects=False,
     win_private_assemblies=False,
     cipher=block_cipher,
@@ -28,9 +28,9 @@ exe = EXE(
     name='PersianSubtitleFixer',
     debug=False,
     bootloader_ignore_signals=False,
-    strip=False,
+    strip=True,  # Strip symbols to reduce size
     upx=True,
-    console=True,
+    console=False,  # Changed to False to hide terminal window
     disable_windowed_traceback=False,
     argv_emulation=False,
     target_arch=None,
@@ -44,7 +44,7 @@ coll = COLLECT(
     a.binaries,
     a.zipfiles,
     a.datas,
-    strip=False,
+    strip=True,  # Strip symbols to reduce size
     upx=True,
     upx_exclude=[],
     name='PersianSubtitleFixer'
