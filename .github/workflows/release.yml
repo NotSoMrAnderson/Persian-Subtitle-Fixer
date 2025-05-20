@@ -69,16 +69,19 @@ jobs:
           APP_VERSION: ${{ github.ref_type == 'tag' && github.ref_name || 'dev' }}
 
       - name: Windows Code Signing (optional)
-        if: success() && runner.os == 'Windows'
+        if: runner.os == 'Windows'
         shell: bash
+        env:
+          WINDOWS_CERT_BASE64: ${{ secrets.WINDOWS_CERT_BASE64 }}
+          WINDOWS_CERT_PASSWORD: ${{ secrets.WINDOWS_CERT_PASSWORD }}
         run: |
-          if [ -n "${{ secrets.WINDOWS_CERT_BASE64 }}" ] && [ -n "${{ secrets.WINDOWS_CERT_PASSWORD }}" ]; then
+          if [ -n "$WINDOWS_CERT_BASE64" ] && [ -n "$WINDOWS_CERT_PASSWORD" ]; then
             echo "Signing executable..."
             certPath="$RUNNER_TEMP/cert.pfx"
-            echo "${{ secrets.WINDOWS_CERT_BASE64 }}" | base64 -d > "$certPath"
+            echo "$WINDOWS_CERT_BASE64" | base64 -d > "$certPath"
             "/c/Program Files (x86)/Windows Kits/10/bin/x64/signtool.exe" sign \
               /f "$certPath" \
-              /p "${{ secrets.WINDOWS_CERT_PASSWORD }}" \
+              /p "$WINDOWS_CERT_PASSWORD" \
               /tr http://timestamp.digicert.com \
               /td sha256 \
               /fd sha256 \
