@@ -12,6 +12,16 @@ jobs:
     strategy:
       matrix:
         os: [windows-latest, ubuntu-latest, macos-latest]
+        include:
+          - os: windows-latest
+            artifact_name: PersianSubtitleFixer-Windows
+            executable_ext: .exe
+          - os: ubuntu-latest
+            artifact_name: PersianSubtitleFixer-Linux
+            executable_ext: ""
+          - os: macos-latest
+            artifact_name: PersianSubtitleFixer-macOS
+            executable_ext: ""
 
     env:
       APP_VERSION: ${{ github.ref_name }}
@@ -34,22 +44,44 @@ jobs:
         run: |
           pyinstaller PersianSubtitleFixer.spec
 
-      - name: Rename output with version
-        if: success()
+      - name: Prepare release package - Windows
+        if: matrix.os == 'windows-latest'
         run: |
-          ext=""
-          if [[ "${{ runner.os }}" == "Windows" ]]; then ext=".exe"; fi
-          mv dist/PersianSubtitleFixer/PersianSubtitleFixer$ext dist/PersianSubtitleFixer-${{ runner.os }}-${{ env.APP_VERSION }}$ext
+          # Create a clean directory for release files
+          mkdir -p release
+          # Copy the executable and necessary files to release directory
+          cp dist/PersianSubtitleFixer/PersianSubtitleFixer.exe release/PersianSubtitleFixer${{ env.APP_VERSION }}${{ matrix.executable_ext }}
+          # Copy any other necessary files
+          if (Test-Path "dist/PersianSubtitleFixer/assets") {
+            cp -r dist/PersianSubtitleFixer/assets release/
+          }
+          # Copy any readme or documentation
+          if (Test-Path "README.md") {
+            cp README.md release/
+          }
+        shell: pwsh
+
+      - name: Prepare release package - Unix
+        if: matrix.os != 'windows-latest'
+        run: |
+          # Create a clean directory for release files
+          mkdir -p release
+          # Copy the executable and necessary files to release directory
+          cp dist/PersianSubtitleFixer/PersianSubtitleFixer release/PersianSubtitleFixer${{ env.APP_VERSION }}
+          # Make executable
+          chmod +x release/PersianSubtitleFixer${{ env.APP_VERSION }}
+          # Copy any other necessary files
+          if [ -d "dist/PersianSubtitleFixer/assets" ]; then
+            cp -r dist/PersianSubtitleFixer/assets release/
+          fi
+          # Copy any readme or documentation
+          if [ -f "README.md" ]; then
+            cp README.md release/
+          fi
         shell: bash
 
-      - name: Archive
-        uses: actions/upload-artifact@v4
-        with:
-          name: dist-${{ runner.os }}
-          path: dist/PersianSubtitleFixer-*
-
       - name: Windows Code Signing (optional)
-        if: runner.os == 'Windows' && env.WINDOWS_CERT_BASE64 != '' && env.WINDOWS_CERT_PASSWORD != ''
+        if: matrix.os == 'windows-latest' && env.WINDOWS_CERT_BASE64 != '' && env.WINDOWS_CERT_PASSWORD != ''
         shell: bash
         run: |
           echo "Signing executable..."
@@ -61,33 +93,37 @@ jobs:
             /tr http://timestamp.digicert.com \
             /td sha256 \
             /fd sha256 \
-            dist/PersianSubtitleFixer-Windows-${{ env.APP_VERSION }}.exe
+            release/PersianSubtitleFixer${{ env.APP_VERSION }}${{ matrix.executable_ext }}
+        env:
+          WINDOWS_CERT_BASE64: ${{ secrets.WINDOWS_CERT_BASE64 }}
+          WINDOWS_CERT_PASSWORD: ${{ secrets.WINDOWS_CERT_PASSWORD }}
 
-      - name: Zip Windows build
-        if: startsWith(matrix.os, 'Windows')
+      - name: Create release archive
         run: |
-          Compress-Archive -Path dist\PersianSubtitleFixer\* -DestinationPath dist\PersianSubtitleFixer-Windows-${{ env.APP_VERSION }}.zip
-        shell: pwsh
-
-      - name: Zip macOS build
-        if: startsWith(matrix.os, 'macos')
-        run: |
-          cd dist/PersianSubtitleFixer
-          zip -r ../PersianSubtitleFixer-macOS-${{ env.APP_VERSION }}.zip *
-        shell: bash
-      
-      - name: Zip Linux build
-        if: startsWith(matrix.os, 'ubuntu')
-        run: |
-          cd dist/PersianSubtitleFixer
-          zip -r ../PersianSubtitleFixer-Linux-${{ env.APP_VERSION }}.zip *
+          cd release
+          if [ "${{ runner.os }}" == "Windows" ]; then
+            powershell Compress-Archive -Path * -DestinationPath ../PersianSubtitleFixer-Windows-${{ env.APP_VERSION }}.zip
+          else
+            zip -r ../PersianSubtitleFixer-${{ runner.os }}-${{ env.APP_VERSION }}.zip *
+          fi
         shell: bash
 
-      - name: Upload Zipped Output
+      - name: Generate SHA256 checksum
+        run: |
+          if [ "${{ runner.os }}" == "Windows" ]; then
+            powershell "(Get-FileHash -Algorithm SHA256 PersianSubtitleFixer-Windows-${{ env.APP_VERSION }}.zip).Hash.ToLower() > PersianSubtitleFixer-Windows-${{ env.APP_VERSION }}.zip.sha256"
+          else
+            shasum -a 256 PersianSubtitleFixer-${{ runner.os }}-${{ env.APP_VERSION }}.zip | cut -d' ' -f1 > PersianSubtitleFixer-${{ runner.os }}-${{ env.APP_VERSION }}.zip.sha256
+          fi
+        shell: bash
+
+      - name: Upload Release Package
         uses: actions/upload-artifact@v4
         with:
-          name: PersianSubtitleFixer-${{ runner.os }}-${{ env.APP_VERSION }}
-          path: dist/PersianSubtitleFixer-${{ runner.os }}-${{ env.APP_VERSION }}.zip
+          name: ${{ matrix.artifact_name }}-${{ env.APP_VERSION }}
+          path: |
+            PersianSubtitleFixer-${{ runner.os }}-${{ env.APP_VERSION }}.zip
+            PersianSubtitleFixer-${{ runner.os }}-${{ env.APP_VERSION }}.zip.sha256
 
   release:
     needs: build
@@ -98,7 +134,28 @@ jobs:
         with:
           path: artifacts
 
+      - name: List artifacts
+        run: ls -R artifacts
+        shell: bash
+
+      - name: Prepare release files
+        run: |
+          mkdir -p release_files
+          find artifacts -name "*.zip" -o -name "*.sha256" | xargs -I{} cp {} release_files/
+        shell: bash
+
       - name: Publish GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          files: artifacts/**/*.zip
+          files: release_files/*
+          generate_release_notes: true
+          body: |
+            # PersianSubtitleFixer ${{ github.ref_name }}
+            
+            ## Installation
+            - Download the appropriate zip file for your operating system
+            - Extract the zip file
+            - Run the executable
+            
+            ## SHA256 Checksums
+            Each zip file has a corresponding .sha256 file containing the file's checksum for verification.
