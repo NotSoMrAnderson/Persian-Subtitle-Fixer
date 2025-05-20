@@ -1,0 +1,99 @@
+name: Build and Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+
+    env:
+      ICON_ICO: assets/icon.ico
+      ICON_ICNS: assets/icon.icns
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies and UPX
+        run: |
+          python -m pip install --upgrade pip
+          pip install pyinstaller
+          if [ "${{ runner.os }}" = "Linux" ]; then
+            sudo apt-get update && sudo apt-get install -y upx
+          fi
+
+      - name: Extract version from tag
+        if: startsWith(github.ref, 'refs/tags/')
+        run: echo "APP_VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
+
+      - name: Set default version if not tag
+        if: ${{ !startsWith(github.ref, 'refs/tags/') }}
+        run: echo "APP_VERSION=dev" >> $GITHUB_ENV
+
+      - name: Generate spec file (macOS only)
+        if: runner.os == 'macOS'
+        run: |
+          pyi-makespec --onefile --windowed --icon "assets\comics-mask_97446.icns" main.py
+          sed -i '' "s/'main.py'/main.py/" main.spec
+          echo -e "\napp = BUNDLE(exe, name='MyApp.app', icon='assets\comics-mask_97446.icns')" >> main.spec
+
+      - name: Build executable
+        run: |
+          echo "Building app version: $APP_VERSION"
+          if [ "${{ runner.os }}" = "macOS" ]; then
+            pyinstaller main.spec
+          else
+            pyinstaller --onefile --icon "assets\comics-mask_97446.ico" main.py
+        env:
+          APP_VERSION: ${{ env.APP_VERSION }}
+
+      - name: Windows Code Signing (optional)
+        if: runner.os == 'Windows' && secrets.WINDOWS_CERT_BASE64 != ''
+        run: |
+          echo "Signing executable"
+          $certPath = "$env:RUNNER_TEMP\\cert.pfx"
+          [System.IO.File]::WriteAllBytes($certPath, [Convert]::FromBase64String("${{ secrets.WINDOWS_CERT_BASE64 }}"))
+          & 'C:\Program Files (x86)\Windows Kits\10\bin\x64\signtool.exe' sign /f $certPath /p "${{ secrets.WINDOWS_CERT_PASSWORD }}" /tr http://timestamp.digicert.com /td sha256 /fd sha256 dist\main.exe
+
+      - name: Rename output with version
+        run: |
+          ext=""
+          if [ "${{ runner.os }}" = "Windows" ]; then ext=".exe"; fi
+          mv dist/main$ext dist/myapp-${{ runner.os }}-${{ env.APP_VERSION }}$ext
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: myapp-${{ runner.os }}
+          path: dist/myapp-${{ runner.os }}-*
+          
+  release:
+    name: Create GitHub Release
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: artifacts/**/*
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
