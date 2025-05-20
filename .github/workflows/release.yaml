@@ -32,7 +32,7 @@ jobs:
 
       - name: Build with PyInstaller
         run: |
-          pyinstaller --noconfirm --onefile PersianSubtitleFixer.spec
+          pyinstaller PersianSubtitleFixer.spec
 
       - name: Rename output with version
         if: success()
