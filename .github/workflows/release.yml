@@ -61,12 +61,17 @@ jobs:
           APP_VERSION: ${{ env.APP_VERSION }}
 
       - name: Windows Code Signing (optional)
-        if: runner.os == 'Windows' && secrets.WINDOWS_CERT_BASE64 != ''
+        if: runner.os == 'Windows'
         run: |
-          echo "Signing executable"
-          $certPath = "$env:RUNNER_TEMP\\cert.pfx"
-          [System.IO.File]::WriteAllBytes($certPath, [Convert]::FromBase64String("${{ secrets.WINDOWS_CERT_BASE64 }}"))
-          & 'C:\Program Files (x86)\Windows Kits\10\bin\x64\signtool.exe' sign /f $certPath /p "${{ secrets.WINDOWS_CERT_PASSWORD }}" /tr http://timestamp.digicert.com /td sha256 /fd sha256 dist\main.exe
+          if [ -n "${{ secrets.WINDOWS_CERT_BASE64 }}" ] && [ -n "${{ secrets.WINDOWS_CERT_PASSWORD }}" ]; then
+            echo "Signing executable..."
+            $certPath = "$env:RUNNER_TEMP\\cert.pfx"
+            [System.IO.File]::WriteAllBytes($certPath, [Convert]::FromBase64String("${{ secrets.WINDOWS_CERT_BASE64 }}"))
+            & 'C:\Program Files (x86)\Windows Kits\10\bin\x64\signtool.exe' sign /f $certPath /p "${{ secrets.WINDOWS_CERT_PASSWORD }}" /tr http://timestamp.digicert.com /td sha256 /fd sha256 dist\main.exe
+          else
+            echo "Skipping signing: secrets not set"
+          fi
+        shell: pwsh
 
       - name: Rename output with version
         run: |
