@@ -1,22 +1,23 @@
 name: Release
 
 on:
-  workflow_dispatch:
+  push:
+    tags:
+      - 'v*'
 
 jobs:
   build:
+    name: Build on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
+        os: [windows-latest, ubuntu-latest, macos-latest]
 
     env:
-      ICON_ICO: assets/comics-mask_97446.ico
-      ICON_ICNS: assets/comics-mask_97446.icns
-      APP_VERSION: 1.0.0
+      APP_VERSION: ${{ github.ref_name }}
 
     steps:
-      - name: Checkout code
+      - name: Checkout repo
         uses: actions/checkout@v4
 
       - name: Set up Python
@@ -27,55 +28,51 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install pyinstaller PyQt5 chardet
+          pip install pyinstaller chardet PyQt5
 
       - name: Build with PyInstaller
         run: |
-          pyinstaller main.py \
-            --onefile \
-            --windowed \
-            --name=PersianSubtitleFixer \
-            --hidden-import=PyQt5.sip \
-            --hidden-import=PyQt5.QtWidgets \
-            --hidden-import=PyQt5.QtCore \
-            --hidden-import=PyQt5.QtGui \
-            --clean
+          pyinstaller PersianSubtitleFixer.spec
 
-      - name: Rename output with version
-        if: success()
-        shell: bash
+      - name: Rename output
         run: |
           ext=""
-          if [ "${{ runner.os }}" = "Windows" ]; then ext=".exe"; fi
+          if [[ "${{ runner.os }}" == "Windows" ]]; then ext=".exe"; fi
           mv dist/PersianSubtitleFixer$ext dist/PersianSubtitleFixer-${{ runner.os }}-${{ env.APP_VERSION }}$ext
+        shell: bash
 
-      - name: Upload artifact
+      - name: Archive
         uses: actions/upload-artifact@v4
         with:
-          name: build-${{ runner.os }}
+          name: dist-${{ runner.os }}
           path: dist/PersianSubtitleFixer-*
 
       - name: Windows Code Signing (optional)
-        if: success() && (runner.os == 'Windows')
+        if: runner.os == 'Windows' && env.WINDOWS_CERT_BASE64 != '' && env.WINDOWS_CERT_PASSWORD != ''
         shell: bash
         run: |
-          if [[ -n "$WINDOWS_CERT_BASE64" && -n "$WINDOWS_CERT_PASSWORD" ]]; then
-            echo "Signing executable..."
-            certPath="$RUNNER_TEMP/cert.pfx"
-            echo "$WINDOWS_CERT_BASE64" | base64 -d > "$certPath"
-            "/c/Program Files (x86)/Windows Kits/10/bin/x64/signtool.exe" sign \
-              /f "$certPath" \
-              /p "$WINDOWS_CERT_PASSWORD" \
-              /tr http://timestamp.digicert.com \
-              /td sha256 \
-              /fd sha256 \
-              dist/PersianSubtitleFixer-${{ runner.os }}-${{ env.APP_VERSION }}.exe
-          else
-            echo "Skipping signing: secrets not set"
-          fi
-        env:
-          WINDOWS_CERT_BASE64: ${{ secrets.WINDOWS_CERT_BASE64 }}
-          WINDOWS_CERT_PASSWORD: ${{ secrets.WINDOWS_CERT_PASSWORD }}
+          echo "Signing executable..."
+          certPath="$RUNNER_TEMP/cert.pfx"
+          echo "$WINDOWS_CERT_BASE64" | base64 -d > "$certPath"
+          "/c/Program Files (x86)/Windows Kits/10/bin/x64/signtool.exe" sign \
+            /f "$certPath" \
+            /p "$WINDOWS_CERT_PASSWORD" \
+            /tr http://timestamp.digicert.com \
+            /td sha256 \
+            /fd sha256 \
+            dist/PersianSubtitleFixer-Windows-${{ env.APP_VERSION }}.exe
+
+      - name: Zip
+        run: |
+          cd dist
+          zip -r PersianSubtitleFixer-${{ runner.os }}-${{ env.APP_VERSION }}.zip PersianSubtitleFixer-*
+        shell: bash
+
+      - name: Upload Zipped Output
+        uses: actions/upload-artifact@v4
+        with:
+          name: PersianSubtitleFixer-${{ runner.os }}-${{ env.APP_VERSION }}
+          path: dist/PersianSubtitleFixer-${{ runner.os }}-${{ env.APP_VERSION }}.zip
 
   release:
     needs: build
@@ -86,10 +83,7 @@ jobs:
         with:
           path: artifacts
 
-      - name: Create Release
+      - name: Publish GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          files: artifacts/**/*
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        if: startsWith(github.ref, 'refs/tags/')
+          files: artifacts/**/*.zip
