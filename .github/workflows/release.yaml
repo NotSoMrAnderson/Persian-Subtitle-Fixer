@@ -63,10 +63,25 @@ jobs:
             /fd sha256 \
             dist/PersianSubtitleFixer-Windows-${{ env.APP_VERSION }}.exe
 
-      - name: Zip
+      - name: Zip Windows build
+        if: startsWith(matrix.os, 'Windows')
+        run: |
+          $dest = "dist/PersianSubtitleFixer-Windows-${{ env.APP_VERSION }}.zip"
+          Compress-Archive -Path dist/PersianSubtitleFixer-* -DestinationPath $dest
+        shell: pwsh
+      
+      - name: Zip macOS build
+        if: startsWith(matrix.os, 'macos')
         run: |
           cd dist
-          zip -r PersianSubtitleFixer-${{ runner.os }}-${{ env.APP_VERSION }}.zip PersianSubtitleFixer-*
+          zip -r PersianSubtitleFixer-macOS-${{ env.APP_VERSION }}.zip PersianSubtitleFixer-*
+        shell: bash
+      
+      - name: Zip Linux build
+        if: startsWith(matrix.os, 'ubuntu')
+        run: |
+          cd dist
+          zip -r PersianSubtitleFixer-Linux-${{ env.APP_VERSION }}.zip PersianSubtitleFixer-*
         shell: bash
 
       - name: Upload Zipped Output
