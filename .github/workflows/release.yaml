@@ -103,23 +103,31 @@ jobs:
           WINDOWS_CERT_BASE64: ${{ secrets.WINDOWS_CERT_BASE64 }}
           WINDOWS_CERT_PASSWORD: ${{ secrets.WINDOWS_CERT_PASSWORD }}
 
-      - name: Create release archive
+      - name: Create release archive - Windows
+        if: runner.os == 'Windows'
         run: |
           cd release
-          if [ "${{ runner.os }}" == "Windows" ]; then
-            powershell Compress-Archive -Path * -DestinationPath ../PersianSubtitleFixer-Windows-${{ env.APP_VERSION }}.zip
-          else
-            zip -r ../PersianSubtitleFixer-${{ runner.os }}-${{ env.APP_VERSION }}.zip *
-          fi
+          Compress-Archive -Path .\* -DestinationPath ..\PersianSubtitleFixer-Windows-${{ env.APP_VERSION }}.zip
+        shell: pwsh
+        
+      - name: Create release archive - Unix
+        if: runner.os != 'Windows'
+        run: |
+          cd release
+          zip -r ../PersianSubtitleFixer-${{ runner.os }}-${{ env.APP_VERSION }}.zip *
         shell: bash
 
-      - name: Generate SHA256 checksum
+      - name: Generate SHA256 checksum - Windows
+        if: runner.os == 'Windows'
         run: |
-          if [ "${{ runner.os }}" == "Windows" ]; then
-            powershell "(Get-FileHash -Algorithm SHA256 PersianSubtitleFixer-Windows-${{ env.APP_VERSION }}.zip).Hash.ToLower() > PersianSubtitleFixer-Windows-${{ env.APP_VERSION }}.zip.sha256"
-          else
-            shasum -a 256 PersianSubtitleFixer-${{ runner.os }}-${{ env.APP_VERSION }}.zip | cut -d' ' -f1 > PersianSubtitleFixer-${{ runner.os }}-${{ env.APP_VERSION }}.zip.sha256
-          fi
+          $hash = (Get-FileHash -Algorithm SHA256 -Path PersianSubtitleFixer-Windows-${{ env.APP_VERSION }}.zip).Hash.ToLower()
+          $hash | Out-File -FilePath PersianSubtitleFixer-Windows-${{ env.APP_VERSION }}.zip.sha256 -Encoding ascii
+        shell: pwsh
+
+      - name: Generate SHA256 checksum - Unix
+        if: runner.os != 'Windows'
+        run: |
+          shasum -a 256 PersianSubtitleFixer-${{ runner.os }}-${{ env.APP_VERSION }}.zip | cut -d' ' -f1 > PersianSubtitleFixer-${{ runner.os }}-${{ env.APP_VERSION }}.zip.sha256
         shell: bash
 
       - name: Upload Release Package
