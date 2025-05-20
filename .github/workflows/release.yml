@@ -75,7 +75,7 @@ jobs:
           WINDOWS_CERT_BASE64: ${{ secrets.WINDOWS_CERT_BASE64 }}
           WINDOWS_CERT_PASSWORD: ${{ secrets.WINDOWS_CERT_PASSWORD }}
         run: |
-          if [ -n "$WINDOWS_CERT_BASE64" ] && [ -n "$WINDOWS_CERT_PASSWORD" ]; then
+          if [[ -n "$WINDOWS_CERT_BASE64" && -n "$WINDOWS_CERT_PASSWORD" ]]; then
             echo "Signing executable..."
             certPath="$RUNNER_TEMP/cert.pfx"
             echo "$WINDOWS_CERT_BASE64" | base64 -d > "$certPath"
