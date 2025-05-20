@@ -57,6 +57,7 @@ jobs:
             pyinstaller main.spec
           else
             pyinstaller --onefile --icon "$ICON_ICO" main.py
+          fi
         env:
           APP_VERSION: ${{ env.APP_VERSION }}
 
