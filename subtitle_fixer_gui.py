@@ -1,8 +1,8 @@
-from sys import argv, exit
+from os import getenv
 
 from PyQt5.QtCore import Qt, QPoint
 from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QApplication, QHBoxLayout, QLabel, QPushButton, QVBoxLayout, QWidget
+from PyQt5.QtWidgets import QHBoxLayout, QLabel, QPushButton, QVBoxLayout, QWidget
 
 from subtitle_processor import main
 
@@ -26,13 +26,14 @@ class MainWindow(QWidget):
 
 
 class MyBar(QWidget):
+    __version__ = getenv("APP_VERSION", "0.0.0")
 
     def __init__(self, parent):
         super().__init__()
         self.parent = parent
         self.MBlayout = QHBoxLayout()
         self.MBlayout.setContentsMargins(0, 0, 5, 5)
-        self.title = QLabel("Ne0 sub Fixer 1.0")
+        self.title = QLabel("Sub Fixer " + self.__version__)
 
         self.btn_close = QPushButton("x")
         self.btn_close.clicked.connect(self.btn_close_clicked)
@@ -157,10 +158,3 @@ class NewLabel(QLabel):
         self.stat = True
         self.setText("Done! {} Files were not supported Files\nClick for Fixing more. ".format(count))
         self.setAcceptDrops(False)
-
-
-if __name__ == "__main__":
-    app = QApplication(argv)
-    mw = MainWindow()
-    mw.show()
-    exit(app.exec_())
