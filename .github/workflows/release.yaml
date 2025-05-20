@@ -91,10 +91,11 @@ jobs:
           fi
 
       - name: Rename output with version
+        shell: pwsh
         run: |
-          ext=""
-          if [ "${{ runner.os }}" = "Windows" ]; then ext=".exe"; fi
-          mv dist/main$ext dist/myapp-${{ runner.os }}-${{ env.APP_VERSION }}$ext
+          $ext = ""
+          if ($env:RUNNER_OS -eq "Windows") { $ext = ".exe" }
+          Rename-Item "dist/main$ext" "dist/myapp-$env:RUNNER_OS-$env:APP_VERSION$ext"
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
