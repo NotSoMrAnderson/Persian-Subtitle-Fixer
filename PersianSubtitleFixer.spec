@@ -8,7 +8,7 @@ a = Analysis(
     ['main.py'],
     pathex=[],
     binaries=[],
-    datas=[],
+    datas=[('assets/comics-mask_97446.ico', 'assets')],
     hiddenimports=['PyQt5.sip'],
     hookspath=[],
     runtime_hooks=[],
@@ -21,16 +21,17 @@ a = Analysis(
 pyz = PYZ(a.pure, a.zipped_data, cipher=block_cipher)
 
 exe = EXE(
-    path=os.path.join("dist", "PersianSubtitleFixer"),
-    name="PersianSubtitleFixer",
+    pyz,
+    a.scripts,
+    [],
+    exclude_binaries=True,
+    name='PersianSubtitleFixer',
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
     upx=True,
     console=True,
-    disable_windowed_traceback=False,
-    icon='assets/comics-mask_97446.ico',
-    binaries=[("python311.dll", r"C:\hostedtoolcache\windows\Python\3.11.9\x64\python311.dll", "BINARY")]
+    icon='assets/comics-mask_97446.ico'
 )
 
 coll = COLLECT(
