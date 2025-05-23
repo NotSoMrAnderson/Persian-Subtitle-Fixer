@@ -1,4 +1,4 @@
-#Persian Subtitle Fixer
+# Persian Subtitle Fixer
 
 Simple program for fixing subtitle encoding issue which leads to gibberish words when using them on players. 
 supported formats are SRT, srt, ass. multi file fixing is supported.  
