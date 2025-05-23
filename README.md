@@ -1,9 +1,9 @@
-# Ne0 Persian Subtitle Fixer
+#Persian Subtitle Fixer
 
-Simple program for fixing subtitles encoding issue which leads to gibberish words when using them on players. 
-supported formats are SRT, srt, ass. Feel free to use it on one or more files.  
+Simple program for fixing subtitle encoding issue which leads to gibberish words when using them on players. 
+supported formats are SRT, srt, ass. multi file fixing is supported.  
 
-PS: only use Utf-8 or ascii format subs
+PS: only use Utf-8 or ANSI encoding files
 
 ---
 ## Todo List
