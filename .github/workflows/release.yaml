@@ -21,7 +21,7 @@ jobs:
             executable_ext: ""
           - os: macos-latest
             artifact_name: PersianSubtitleFixer-macOS
-            executable_ext: ""
+            executable_ext: .dmg
 
     env:
       APP_VERSION: ${{ github.ref_name }}
